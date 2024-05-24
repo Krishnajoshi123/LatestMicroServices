@@ -1,6 +1,8 @@
 package com.lcwd.user.service.controllers;
 
+import com.lcwd.user.service.config.AppConstants;
 import com.lcwd.user.service.entities.User;
+import com.lcwd.user.service.payload.UserResponse;
 import com.lcwd.user.service.services.UserService;
 
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
@@ -61,8 +63,13 @@ public class UserController {
 
     //all user get
     @GetMapping
-    public ResponseEntity<List<User>> getAllUser() {
-        List<User> allUser = userService.getAllUser();
+    public ResponseEntity<UserResponse> getAllUser(
+            @RequestParam(value = "pageNumber", defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber,
+            @RequestParam(value = "pageSize", defaultValue = AppConstants.PAGE_SIZE, required = false) Integer pageSize,
+            @RequestParam(value = "sortBy", defaultValue = AppConstants.SORT_BY_USER_ID, required = false) String sortBy,
+            @RequestParam(value = "sortOrd", defaultValue = AppConstants.SORT_ORD_ASC, required = false) String sortOrd
+    ) {
+        UserResponse allUser = userService.getAllUser(pageNumber, pageSize, sortBy, sortOrd);
         return ResponseEntity.ok(allUser);
     }
 }

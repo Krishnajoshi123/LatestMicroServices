@@ -1,15 +1,21 @@
 package com.lcwd.user.service.services.impl;
 
+import com.lcwd.user.service.config.AppConstants;
 import com.lcwd.user.service.entities.Hotel;
 import com.lcwd.user.service.entities.Rating;
 import com.lcwd.user.service.entities.User;
 import com.lcwd.user.service.exceptions.ResourceNotFoundException;
 import com.lcwd.user.service.external.services.HotelService;
+import com.lcwd.user.service.payload.UserResponse;
 import com.lcwd.user.service.repositories.UserRepository;
 import com.lcwd.user.service.services.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -49,10 +55,27 @@ public class UserServiceImpl implements UserService {
 //    }
 
     @Override
-    public List<User> getAllUser() {
+    public UserResponse getAllUser(Integer pageNumber, Integer pageSize, String sortBy, String sortOrd) {
+//        sorting
+        Sort sort = (sortOrd.equalsIgnoreCase(AppConstants.SORT_ORD_ASC)) ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+//        pagination
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
+        Page<User> userPage = this.userRepository.findAll(pageable);
+        List<User> user1 = userPage.getContent();
+        UserResponse userResponse = new UserResponse();
+        userResponse.setContent(user1);
+        userResponse.setLastPage(userPage.isLast());
+        userResponse.setNumberOfElementsInCurrentPage(userPage.getNumberOfElements());
+        userResponse.setPageNumber(userPage.getNumber());
+        userResponse.setPageSize(userPage.getSize());
+        userResponse.setTotalPages(userPage.getTotalPages());
+        userResponse.setTotalRecords(userPage.getTotalElements());
+
+
         //implement RATING SERVICE CALL: USING REST TEMPLATE
-        List<User> users = userRepository.findAll();
-        for (User user : users) {
+//        List<User> users = userRepository.findAll();
+        for (User user : user1) {
 
             // fetch rating of the above  user from RATING SERVICE
             //http://localhost:8083/ratings/users/47e38dac-c7d0-4c40-8582-11d15f185fad
@@ -75,7 +98,7 @@ public class UserServiceImpl implements UserService {
             user.setRatings(ratingList);
         }
 
-        return users;
+        return userResponse;
     }
 
     //get single user

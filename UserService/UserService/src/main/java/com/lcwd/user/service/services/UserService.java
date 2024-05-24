@@ -1,6 +1,7 @@
 package com.lcwd.user.service.services;
 
 import com.lcwd.user.service.entities.User;
+import com.lcwd.user.service.payload.UserResponse;
 
 import java.util.List;
 
@@ -12,7 +13,7 @@ public interface UserService {
     User saveUser(User user);
 
     //get all user
-    List<User> getAllUser();
+    UserResponse getAllUser(Integer pageNumber, Integer pageSize, String sortBy, String sortOrd);
 
     //get single user of given userId
 

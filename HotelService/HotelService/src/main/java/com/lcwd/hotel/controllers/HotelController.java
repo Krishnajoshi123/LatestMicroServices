@@ -1,6 +1,8 @@
 package com.lcwd.hotel.controllers;
 
+import com.lcwd.hotel.config.AppConstants;
 import com.lcwd.hotel.entites.Hotel;
+import com.lcwd.hotel.payload.HotelResponse;
 import com.lcwd.hotel.services.HotelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -37,8 +39,14 @@ public class HotelController {
     //get all
 //    @PreAuthorize("hasAuthority('SCOPE_internal') || hasAuthority('Admin')")
     @GetMapping
-    public ResponseEntity<List<Hotel>> getAll(){
-        return ResponseEntity.ok(hotelService.getAll());
+    public ResponseEntity<HotelResponse> getAll(
+            @RequestParam(value = "pageNumber", defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber,
+            @RequestParam(value = "pageSize", defaultValue = AppConstants.PAGE_SIZE, required = false) Integer pageSize,
+            @RequestParam(value = "sortBy", defaultValue = AppConstants.SORT_BY_HOTEL_ID, required = false) String sortBy,
+            @RequestParam(value = "sortOrd", defaultValue = AppConstants.SORT_ORD_ASC, required = false) String sortOrd
+    ){
+        HotelResponse allHotels = hotelService.getAll(pageNumber, pageSize, sortBy, sortOrd);
+        return ResponseEntity.ok(allHotels);
     }
 
 
